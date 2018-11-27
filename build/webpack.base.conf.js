@@ -33,7 +33,7 @@ module.exports = {
   },
   externals: {
     'vue': 'Vue',
-    'axios': 'axios'
+    'flyio': 'fly'
   },
   module: {
     rules: [

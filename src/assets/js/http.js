@@ -1,34 +1,34 @@
-import axios from 'axios'
-import qs from 'qs'
+import flyio from 'flyio'
 import 'babel-polyfill'
 
 const APIS = {
   internationCode: {
     method: 'GET',
-    url: '/api/v1/common/get_country'
+    url: '/api/v1/web/coin/price'
+  },
+  refund: {
+    method: 'POST',
+    url: '/web/api/refund'
   }
 }
 
-axios.defaults.baseURL = 'http://192.168.2.211:8085'
-// axios.defaults.withCredentials = true
-axios.defaults.timeout = 100000
-axios.defaults.headers.get['Content-Type'] = 'application/json'
-axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
-axios.defaults.responseType = 'json'
+flyio.config.baseURL = 'http://172.16.18.201:8080'
+// flyio.config.withCredentials = true
+flyio.config.timeout = 100000
+flyio.config.responseType = 'json'
 
-axios.defaults.transformRequest = [function (data) {
-  return qs.stringify(data)
-}]
-
-axios.interceptors.request.use(config => {
-  config.headers['Authorization'] = 'Bearer'
+flyio.interceptors.request.use(config => {
+  let contentType = 'application/json'
+  // if (config.method === 'POST') contentType = 'application/x-www-form-urlencoded'
+  config.headers['Content-Type'] = contentType
+  config.headers['Session'] = 'pkfkurqfnteycjagywyfkuxikqbqrcfd'
   return config
 },
 error => {
   return Promise.reject(error)
 })
 
-axios.interceptors.response.use(
+flyio.interceptors.response.use(
   response => {
     return response
   },
@@ -46,7 +46,7 @@ export function fetch (options) {
     const url = !options.url ? APIS[options.api].url : options.url
     if (!method) throw 'fetch options have no method!'
 
-    axios[method.toLowerCase()](url, options.params, options.configs)
+    flyio[method.toLowerCase()](url, options.params, options.configs)
       .then(response => {
         resolve(response.data)
       }, err => {

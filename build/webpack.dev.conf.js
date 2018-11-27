@@ -13,6 +13,11 @@ const portfinder = require('portfinder')
 const HOST = process.env.HOST
 const PORT = process.env.PORT && Number(process.env.PORT)
 
+// add hot-reload related code to entry chunks
+Object.keys(baseWebpackConfig.entry).forEach(function (name) {
+  baseWebpackConfig.entry[name] = ['./build/dev-client'].concat(baseWebpackConfig.entry[name])
+})
+
 const devWebpackConfig = merge(baseWebpackConfig, {
   module: {
     rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap, usePostCSS: true })
@@ -68,28 +73,29 @@ const devWebpackConfig = merge(baseWebpackConfig, {
   ].concat(utils.htmlPlugin())
 })
 
-module.exports = new Promise((resolve, reject) => {
-  portfinder.basePort = process.env.PORT || config.dev.port
-  portfinder.getPort((err, port) => {
-    if (err) {
-      reject(err)
-    } else {
-      // publish the new Port, necessary for e2e tests
-      process.env.PORT = port
-      // add port to devServer config
-      devWebpackConfig.devServer.port = port
+module.exports = devWebpackConfig
+// module.exports = new Promise((resolve, reject) => {
+//   portfinder.basePort = process.env.PORT || config.dev.port
+//   portfinder.getPort((err, port) => {
+//     if (err) {
+//       reject(err)
+//     } else {
+//       // publish the new Port, necessary for e2e tests
+//       process.env.PORT = port
+//       // add port to devServer config
+//       devWebpackConfig.devServer.port = port
 
-      // Add FriendlyErrorsPlugin
-      devWebpackConfig.plugins.push(new FriendlyErrorsPlugin({
-        compilationSuccessInfo: {
-          messages: [`Your application is running here: http://${devWebpackConfig.devServer.host}:${port}`],
-        },
-        onErrors: config.dev.notifyOnErrors
-        ? utils.createNotifierCallback()
-        : undefined
-      }))
+//       // Add FriendlyErrorsPlugin
+//       devWebpackConfig.plugins.push(new FriendlyErrorsPlugin({
+//         compilationSuccessInfo: {
+//           messages: [`Your application is running here: http://${devWebpackConfig.devServer.host}:${port}`],
+//         },
+//         onErrors: config.dev.notifyOnErrors
+//         ? utils.createNotifierCallback()
+//         : undefined
+//       }))
 
-      resolve(devWebpackConfig)
-    }
-  })
-})
+//       resolve(devWebpackConfig)
+//     }
+//   })
+// })
